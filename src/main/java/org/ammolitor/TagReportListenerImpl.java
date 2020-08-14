@@ -36,29 +36,14 @@ public class TagReportListenerImpl implements TagReportListener {
         }
     }
 
-    private static void writeBuffered(List<String> records, int bufSize) throws IOException {
-        File file = new File("tag_data.log");
-        FileWriter writer = new FileWriter(file, true);
-        BufferedWriter bufferedWriter = new BufferedWriter(writer, bufSize);
 
-        write(records, bufferedWriter);
-    }
-
-    private static void write(List<String> records, Writer writer) throws IOException {
-        for (String record : records) {
-            writer.write(record);
-        }
-        writer.flush();
-        writer.close();
-    }
     @Override
     public void onTagReported(ImpinjReader reader, TagReport report) {
         List<Tag> tags = report.getTags();
-        List<String> data = new ArrayList<>();
 
         for (Tag t : tags) {
-            System.out.println(t.getEpc().toString());
-            data.add("{ \"epc\": "       + "\"" + t.getEpc().toString() + "\", " +
+            System.out.print(".");
+            TagReader.data.add("{ \"epc\": "       + "\"" + t.getEpc().toString() + "\", " +
                    "\"timestamp\": "   + t.getLastSeenTime().ToString() + ", " +
                    "\"doppler\": "     + t.getRfDopplerFrequency() + ", " +
                    "\"rssi\": "        + t.getPeakRssiInDbm() + ", " +
@@ -69,11 +54,6 @@ public class TagReportListenerImpl implements TagReportListener {
                    "\"epcsize\": "     + t.getModelDetails().getEpcSizeBits() + ", " +
                    "\"usermemsize\": " + t.getModelDetails().getUserMemorySizeBits() +
                    " }\n");
-        }
-        try {
-            writeBuffered(data,1048576);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

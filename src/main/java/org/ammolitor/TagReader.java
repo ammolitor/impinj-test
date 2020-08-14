@@ -2,14 +2,35 @@ package org.ammolitor;
 
 import com.impinj.octane.*;
 
-import java.io.FileInputStream;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 
 public class TagReader {
+    public static List<String> data = new ArrayList<>();
+
+    private static void writeBuffered(List<String> records, int bufSize) throws IOException {
+        long millis = System.currentTimeMillis();
+        File file = new File(millis + ".log");
+        FileWriter writer = new FileWriter(file, true);
+        BufferedWriter bufferedWriter = new BufferedWriter(writer, bufSize);
+
+        write(records, bufferedWriter);
+    }
+
+    private static void write(List<String> records, Writer writer) throws IOException {
+        for (String record : records) {
+            writer.write(record);
+        }
+        writer.flush();
+        writer.close();
+    }
 
     public static void main(String[] args) {
+        int sleeptime = 10;
 
         try {
             String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
@@ -25,7 +46,7 @@ public class TagReader {
             ImpinjReader reader = new ImpinjReader(hostname, "r420");
 
             // Connect
-            System.out.println("Connecting to " + hostname);
+            System.out.println("Connect : " + hostname);
             reader.connect(hostname);
 
             // Get the default settings
@@ -62,17 +83,18 @@ public class TagReader {
             reader.setTagReportListener(new TagReportListenerImpl());
 
             // Start the reader
+            System.out.println("Start: " + hostname + " for " + sleeptime + " seconds");
             reader.start();
-
-            int sleeptime = 10;
-            System.out.println("Starting Reader for " + sleeptime + " seconds");
             TimeUnit.SECONDS.sleep(sleeptime);
 
-            System.out.println("Stopping  " + hostname);
             reader.stop();
+            System.out.println("\nStop: " + hostname);
 
-            System.out.println("Disconnecting from " + hostname);
             reader.disconnect();
+            System.out.println("Disconnect: " + hostname);
+
+            System.out.println("Readings: " + data.size());
+            writeBuffered(data, 1048576);
 
             System.out.println("Done");
         } catch (OctaneSdkException ex) {
