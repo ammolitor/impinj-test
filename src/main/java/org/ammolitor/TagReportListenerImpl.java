@@ -18,7 +18,11 @@ public class TagReportListenerImpl implements TagReportListener {
         List<Tag> tags = report.getTags();
 
         for (Tag t : tags) {
-            HashMap<String, Object> output = new HashMap<String, Object>();
+            System.out.print(".");
+            /*
+               lets see how many objects we can create in a call back to get json output
+             */
+            HashMap<String, Object> output = new HashMap<>();
             output.putIfAbsent("epc", t.getEpc().toString());
             output.putIfAbsent("timestamp", t.getLastSeenTime().ToString());
             output.putIfAbsent("doppler", t.getRfDopplerFrequency());
@@ -32,7 +36,7 @@ public class TagReportListenerImpl implements TagReportListener {
             GsonBuilder gsonMapBuilder = new GsonBuilder();
             Gson gsonObject = gsonMapBuilder.create();
             String JSONObject = gsonObject.toJson(output);
-            System.out.println(JSONObject);
+            TagReader.data.add(JSONObject);
         }
     }
 
@@ -43,6 +47,9 @@ public class TagReportListenerImpl implements TagReportListener {
 
         for (Tag t : tags) {
             System.out.print(".");
+            /*
+               hand coded json, this is pure silliness
+             */
             TagReader.data.add("{ \"epc\": "       + "\"" + t.getEpc().toString() + "\", " +
                    "\"timestamp\": "   + t.getLastSeenTime().ToString() + ", " +
                    "\"doppler\": "     + t.getRfDopplerFrequency() + ", " +
