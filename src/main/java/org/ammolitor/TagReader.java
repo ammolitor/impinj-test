@@ -30,7 +30,8 @@ public class TagReader {
     }
 
     public static void main(String[] args) {
-        int sleeptime = 10;
+        int sleepTime = 10;
+        double readPower = 30;
 
         try {
             String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
@@ -46,7 +47,7 @@ public class TagReader {
             ImpinjReader reader = new ImpinjReader(hostname, "r420");
 
             // Connect
-            System.out.println("Connect : " + hostname);
+            System.out.println("CONNECT:    " + hostname);
             reader.connect(hostname);
 
             // Get the default settings
@@ -74,7 +75,7 @@ public class TagReader {
             AntennaConfigGroup ac = settings.getAntennas();
             ac.disableAll();
             ac.getAntenna((short) 1).setEnabled(true);
-            ac.getAntenna((short) 1).setTxPowerinDbm(27);
+            ac.getAntenna((short) 1).setTxPowerinDbm(readPower);
 
             // Apply the new settings
             reader.applySettings(settings);
@@ -83,20 +84,20 @@ public class TagReader {
             reader.setTagReportListener(new TagReportListenerImpl());
 
             // Start the reader
-            System.out.println("Start: " + hostname + " for " + sleeptime + " seconds");
+            System.out.println("START:      " + hostname + " FOR " + sleepTime + " SECONDS");
             reader.start();
-            TimeUnit.SECONDS.sleep(sleeptime);
+            TimeUnit.SECONDS.sleep(sleepTime);
 
             reader.stop();
-            System.out.println("\nStop: " + hostname);
+            System.out.println("\nSTOP:       " + hostname);
 
             reader.disconnect();
-            System.out.println("Disconnect: " + hostname);
+            System.out.println("DISCONNECT: " + hostname);
 
-            System.out.println("Readings: " + data.size());
+            System.out.println("READINGS:   " + data.size());
             writeBuffered(data, 1048576);
 
-            System.out.println("Done");
+            System.out.println("DONE");
         } catch (OctaneSdkException ex) {
             System.out.println(ex.getMessage());
         } catch (Exception ex) {
